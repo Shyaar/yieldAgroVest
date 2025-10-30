@@ -1,9 +1,9 @@
-import { HeroSection } from "../components/HeroSection";
-import Features from "../components/Features";
-import { Badge } from "../components/Badge";
-import HowItWorks from "../components/HowitWorks";
+import { HeroSection } from "../components/sections/HeroSection";
+import Features from "../components/sections/Features";
+import { Badge } from "../components/ui/Badge";
+import HowItWorks from "../components/sections/HowitWorks";
 
-export default function Home() {
+export default function Home(){
   return (
     <div className="w-full">
       <HeroSection />

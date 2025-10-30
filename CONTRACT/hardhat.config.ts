@@ -6,7 +6,7 @@ dotenv.config();
 
 const config: HardhatUserConfig = {
   solidity: {
-    version: "0.8.28",
+    version: "0.8.30",
     settings: {
        metadata: {
         bytecodeHash: "none"  // Ensures metadata is included

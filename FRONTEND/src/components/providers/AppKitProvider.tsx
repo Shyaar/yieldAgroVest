@@ -1,41 +1,38 @@
 import { createAppKit } from '@reown/appkit/react'
 import { WagmiProvider } from 'wagmi'
-import { sepolia } from '@reown/appkit/networks'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { WagmiAdapter } from '@reown/appkit-adapter-wagmi'
+import { hederaTestnet } from '@reown/appkit/networks'
 
-// 0. Setup queryClient
 const queryClient = new QueryClient()
 
-const projectId = '9c8981e6010d83149a9d197f041f2229'
+const projectId = 'YOUR_PROJECT_ID'
 
-// 2. App metadata
 const metadata = {
   name: 'Yield',
-  description: 'A decentralize platform that connects investors and farmers',
-  url: 'http://localhost:5173', // 👈 match your dev domain
+  description: 'A decentralized platform connecting investors and farmers',
+  url: 'http://localhost:5173',
   icons: ['https://avatars.githubusercontent.com/u/179229932']
 }
 
-// 3. Use Sepolia for dev/test
-const networks = [sepolia]
+// ✅ 1. Use hederaTestnet network (EVM-compatible)
+const networks = [hederaTestnet] as const
 
-// 4. Wagmi Adapter
+// ✅ 2. Create the Wagmi adapter
 const wagmiAdapter = new WagmiAdapter({
-  networks,
   projectId,
+  networks,
   ssr: true
 })
 
-// 5. Create modal
+// ✅ 3. Initialize AppKit
 createAppKit({
-  adapters: [wagmiAdapter],
-  networks,
   projectId,
   metadata,
-  features: {
-    analytics: true // Optional
-  }
+  adapters: [wagmiAdapter],
+  networks,
+  features: { analytics: true },
+  themeMode: 'light',
 })
 
 export function AppKitProvider({ children }) {

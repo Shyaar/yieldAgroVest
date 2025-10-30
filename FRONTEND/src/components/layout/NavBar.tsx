@@ -1,15 +1,14 @@
 import { useState } from "react";
 import { Menu, X, Wallet, Wrench, Leaf, BookOpen, Search } from "lucide-react";
-import ConnectButton from "./ConnectButton";
+import ConnectButton from "../wallet/ConnectButton";
 
 export default function NavBar() {
   const [isOpen, setIsOpen] = useState(false);
-  const [isHovered, setIsHovered] = useState(false);
+  // const [isHovered, setIsHovered] = useState(false);
   const [isMobileSearch, setIsMobileSearch] = useState(false);
 
   return (
-<nav className=" backdrop-blur-2xl bg-white shadow-md sticky top-4 z-50 
-                mx-4 sm:mx-6 md:mx-10 lg:mx-20">
+<nav className="backdrop-blur-2xl bg-white shadow-md sticky top-0 z-50">
 
       <div className="container mx-auto px-4 py-3 flex items-center justify-between">
         <div className="flex items-center space-x-2">
@@ -22,7 +21,7 @@ export default function NavBar() {
         </div>
 
         <div className="hidden md:flex items-center space-x-8 text-green-800 font-medium">
-          <a
+          {/* <a
             href="#"
             className="group flex items-center relative transition-all duration-300 ease-in-out"
           >
@@ -35,10 +34,10 @@ export default function NavBar() {
                 Services
               </span>
             </div>
-          </a>
+          </a> */}
 
           {/* Solutions */}
-          <a
+          {/* <a
             href="#"
             className="group flex items-center relative transition-all duration-300 ease-in-out"
           >
@@ -51,10 +50,10 @@ export default function NavBar() {
                 Solutions
               </span>
             </div>
-          </a>
+          </a> */}
 
           {/* Resources */}
-          <a
+          {/* <a
             href="#"
             className="group flex items-center relative transition-all duration-300 ease-in-out"
           >
@@ -67,15 +66,14 @@ export default function NavBar() {
                 Resources
               </span>
             </div>
-          </a>
+          </a> */}
 
           {/* Search (Desktop) */}
-          <div
+          {/* <div
             className="relative flex items-center group"
-            onMouseEnter={() => setIsHovered(true)}
-            onMouseLeave={() => setIsHovered(false)}
+            onClick={() => setIsHovered(!isHovered)}
           >
-            <div className="flex items-center bg-green-600/20 group-hover:bg-green-600/10 rounded-full px-3 py-3 transition-all duration-500 ease-in-out overflow-hidden">
+            <div className="flex items-center bg-green-600/20 group-hover:bg-green-600/10 rounded-full px-3 py-3 transition-all w-40 duration-500 ease-in-out overflow-hidden">
               <Search size={20} className="text-green-800" />
               <input
                 type="text"
@@ -85,7 +83,7 @@ export default function NavBar() {
                 }`}
               />
             </div>
-          </div>
+          </div> */}
         </div>
 
         {/* Connect Wallet (desktop) */}

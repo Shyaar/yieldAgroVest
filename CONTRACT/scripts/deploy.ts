@@ -1,19 +1,42 @@
 import { ethers } from "hardhat";
 
-
 async function main() {
-  // Get the signer of the tx and address for minting the token
   const [deployer] = await ethers.getSigners();
-  console.log("Deploying contract with the account:", deployer.address);
+  console.log("Deploying with:", deployer.address);
 
-  // The deployer will also be the owner of our NFT contract
-  const YieldMvp = await ethers.getContractFactory("YieldMvp", deployer);
-  const contract = await YieldMvp.deploy();
+  // 1️⃣ Deploy UserRegistry
+  const UserRegistry = await ethers.getContractFactory("UserRegistry");
+  const userRegistry = await UserRegistry.deploy();
+  await userRegistry.waitForDeployment();
+  const userRegistryAddress = await userRegistry.getAddress();
+  console.log("✅ UserRegistry deployed at:", userRegistryAddress);
 
-  await contract.waitForDeployment();
+  // 2️⃣ Deploy farmNFT
+  const FarmNFT = await ethers.getContractFactory("FarmNFT");
+  const farmNFT = await FarmNFT.deploy();
+  await farmNFT.waitForDeployment();
+  const farmNFTAddress = await farmNFT.getAddress();
+  console.log("✅ farmNFT deployed at:", farmNFTAddress);
 
-  const address = await contract.getAddress();
-  console.log("Contract deployed at:", address);
+  // 3️⃣ Deploy investorsNFTs
+  const InvestorsNFTs = await ethers.getContractFactory("InvestorNFT");
+  const investorsNFTs = await InvestorsNFTs.deploy();
+  await investorsNFTs.waitForDeployment();
+  const investorsNFTsAddress = await investorsNFTs.getAddress();
+  console.log("✅ investorsNFTs deployed at:", investorsNFTsAddress);
+
+  // 4️⃣ Deploy YieldMvp with registry addresses
+  const YieldMvp = await ethers.getContractFactory("YieldMvp");
+  const yieldMvp = await YieldMvp.deploy(
+    userRegistryAddress,
+    farmNFTAddress,
+    investorsNFTsAddress
+  );
+  await yieldMvp.waitForDeployment();
+  console.log("🚀 YieldMvp deployed at:", await yieldMvp.getAddress());
 }
 
-main().catch(console.error);
+main().catch((error) => {
+  console.error(error);
+  process.exitCode = 1;
+});
