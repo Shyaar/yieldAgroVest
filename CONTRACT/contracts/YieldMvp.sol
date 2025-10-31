@@ -17,6 +17,7 @@ contract YieldMvp is ReentrancyGuard, Ownable {
     uint256 public nextFarmId;
     mapping(uint256 => Farm) private farms;
     uint256[] public farmIds;
+    mapping(address => uint256[]) private farmerFarms;
     mapping(address => uint256) public roiBalances;
 
     struct Farm {
@@ -139,6 +140,7 @@ contract YieldMvp is ReentrancyGuard, Ownable {
             _durationDays
         );
         farmIds.push(farmId);
+        farmerFarms[msg.sender].push(farmId);
 
         emit YieldMvpEvents.FarmCreated(
             farmId,
@@ -323,5 +325,9 @@ contract YieldMvp is ReentrancyGuard, Ownable {
         address _investor
     ) external view returns (uint256) {
         return farms[_farmId].investments[_investor];
+    }
+
+    function getFarmsByFarmer(address _farmer) external view returns (uint256[] memory) {
+        return farmerFarms[_farmer];
     }
 }

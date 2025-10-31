@@ -1,10 +1,12 @@
 import { create } from "ipfs-http-client";
 
 const client = create({
-  url: "https://ipfs.infura.io:5001/api/v0",
+  url: `https://ipfs-api.alchemy.com/v2/${import.meta.env.VITE_ALCHEMY_IPFS_API_KEY}`,
 });
 
+
 export async function uploadToIpfs(data: string | File): Promise<string> {
+  console.log(data)
   try {
     const result = await client.add(data);
     return `ipfs://${result.path}`;
@@ -13,6 +15,7 @@ export async function uploadToIpfs(data: string | File): Promise<string> {
     throw error;
   }
 }
+
 
 interface FarmMetadata {
   name: string;

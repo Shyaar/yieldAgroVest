@@ -281,6 +281,7 @@
           "type": "uint256"
         },
         {
+          "indexed": false,
           "internalType": "address",
           "name": "investor",
           "type": "address"
@@ -516,6 +517,25 @@
           "internalType": "address[]",
           "name": "",
           "type": "address[]"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_farmer",
+          "type": "address"
+        }
+      ],
+      "name": "getFarmsByFarmer",
+      "outputs": [
+        {
+          "internalType": "uint256[]",
+          "name": "",
+          "type": "uint256[]"
         }
       ],
       "stateMutability": "view",

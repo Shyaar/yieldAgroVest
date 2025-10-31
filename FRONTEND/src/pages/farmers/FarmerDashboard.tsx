@@ -1,320 +1,193 @@
-import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
-import { toast, Toaster } from "sonner";
-import { Leaf, Plus, Trash2, User, DollarSign, Layers, MapPin } from "lucide-react";
+import { useAccount } from "wagmi";
+import { Button } from "../../components/ui/Button";
+import ListingCard from "../../components/ui/ListingCard";
+import AddFarmModal from "../../components/ui/modals/AddFarmModal";
+import { useSingleUser } from "../../hooks/user/useUserRegistry";
+import { useEffect, useState } from "react";
+import { useFarmsByFarmer } from "../../hooks/yieldmvp/useFarmsByFarmer";
+import { useNavigate } from "react-router-dom";
 
-// -------------------- Types --------------------
-interface Farm {
-  id: number;
-  farmerId: number;
-  name: string;
-  crop: string;
-  budget: number;
-  farmSize: number;
-  totalShares: number;
-  sharePrice: number;
-  durationDays: number;
+type FarmDetails = {
+  id: bigint;
+  farmer: `0x${string}`;
+  budget: bigint;
+  farmSize: bigint;
+  totalShares: bigint;
+  sharePrice: bigint;
+  totalInvested: bigint;
   description: string;
-  growth: number;
-  image?: string;
-  status: "active" | "pending" | "completed";
-}
+  isFunded: boolean;
+  isCompleted: boolean;
+  escrowBalance: bigint;
+  farmDurationDays: bigint;
+  startTime: bigint;
+  milestoneCount: bigint;
+  periodSeconds: bigint;
+  milestonesReleased: bigint;
+};
 
-interface Farmer {
-  id: number;
-  firstName: string;
-  lastName: string;
-  kycCompleted: boolean;
-  location?: string;
-  phone?: string;
-}
+const FarmerDashboard = () => {
+  const { address, isConnected } = useAccount();
+  const { user, loadingUser, refetchUser } = useSingleUser(
+    isConnected ? address : undefined
+  );
+  const { farms, loadingFarms, refetchFarms } = useFarmsByFarmer(address);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const navigate = useNavigate();
 
-// -------------------- Farmer Dashboard --------------------
-export default function FarmerDashboard() {
-  const [farmer, setFarmer] = useState<Farmer | null>(null);
-  const [farms, setFarms] = useState<Farm[]>([]);
-  const [showAddFarm, setShowAddFarm] = useState(false);
+  // Mock data for demonstration
+  const mockFarms: FarmDetails[] = [
+    {
+      id: BigInt(1),
+      farmer: "0x0000000000000000000000000000000000000001",
+      budget: BigInt(10000),
+      farmSize: BigInt(50),
+      totalShares: BigInt(100),
+      sharePrice: BigInt(100),
+      totalInvested: BigInt(5000),
+      description: "Organic corn farm in fertile plains.",
+      isFunded: false,
+      isCompleted: false,
+      escrowBalance: BigInt(5000),
+      farmDurationDays: BigInt(180),
+      startTime: BigInt(Date.now()),
+      milestoneCount: BigInt(3),
+      periodSeconds: BigInt(60 * 60 * 24 * 60),
+      milestonesReleased: BigInt(1),
+    },
+    {
+      id: BigInt(2),
+      farmer: "0x0000000000000000000000000000000000000001",
+      budget: BigInt(25000),
+      farmSize: BigInt(120),
+      totalShares: BigInt(250),
+      sharePrice: BigInt(100),
+      totalInvested: BigInt(25000),
+      description: "Sustainable wheat farm with advanced irrigation.",
+      isFunded: true,
+      isCompleted: false,
+      escrowBalance: BigInt(10000),
+      farmDurationDays: BigInt(365),
+      startTime: BigInt(Date.now() - 86400000 * 30), // Started 30 days ago
+      milestoneCount: BigInt(6),
+      periodSeconds: BigInt(60 * 60 * 24 * 60),
+      milestonesReleased: BigInt(2),
+    },
+  ];
 
-  // Modal inputs
-  const [budget, setBudget] = useState<number>(0);
-  const [farmSize, setFarmSize] = useState<number>(0);
-  const [totalShares, setTotalShares] = useState<number>(0);
-  const [durationDays, setDurationDays] = useState<number>(0);
-  const [description, setDescription] = useState<string>("");
-  const [loading, setLoading] = useState(false);
-  const [shake, setShake] = useState(false);
-
-  // Load data
   useEffect(() => {
-    const storedFarmer = localStorage.getItem("currentFarmer");
-    if (storedFarmer) setFarmer(JSON.parse(storedFarmer));
-
-    const storedFarms = JSON.parse(localStorage.getItem("allFarms") || "[]");
-    if (storedFarms && storedFarmer) {
-      const f: Farmer = JSON.parse(storedFarmer);
-      setFarms(storedFarms.filter((farm: Farm) => farm.farmerId === f.id));
+    if (loadingUser) {
+      console.log("userLoading");
     }
-  }, []);
-
-  const handleAddFarm = () => {
-    if (!budget || !farmSize || !totalShares || !durationDays || !description) {
-      setShake(true);
-      toast.error("Please fill all fields correctly!");
-      setTimeout(() => setShake(false), 600);
-      return;
+    if (user) {
+      console.log("user :", user);
     }
 
-    setLoading(true);
+    if (isConnected && address) {
+      console.log("✅ User Address:", address);
+      getUser(); // optional
+    }
+  }, [loadingUser, user, address]);
 
-    setTimeout(() => {
-      const sharePrice = Math.floor(budget / totalShares);
-      const newFarm: Farm = {
-        id: Date.now(),
-        farmerId: farmer!.id,
-        name: description.split(" ")[0] + " Farm",
-        crop: description.split(" ")[1] || "Unknown",
-        budget,
-        farmSize,
-        totalShares,
-        sharePrice,
-        durationDays,
-        description,
-        growth: Math.floor(Math.random() * 50) + 10,
-        status: "active",
-      };
+  async function getUser() {
+    const userData = await refetchUser();
 
-      const updatedFarms = [...farms, newFarm];
-      setFarms(updatedFarms);
+    if (userData) {
+      console.log(
+        "User object:",
+        userData,
+        "Loading user:",
+        "user name",
+        typeof userData,
+        loadingUser,
+        "username",
+        user
+      );
+    }
+  }
 
-      const allFarms: Farm[] = JSON.parse(localStorage.getItem("allFarms") || "[]");
-      localStorage.setItem("allFarms", JSON.stringify([...allFarms, newFarm]));
-
-      setBudget(0);
-      setFarmSize(0);
-      setTotalShares(0);
-      setDurationDays(0);
-      setDescription("");
-      setShowAddFarm(false);
-      setLoading(false);
-
-      toast.success("Farm added successfully! 🌱");
-    }, 5000);
+  const handleNavigate = (farmId: bigint) => {
+    navigate(`/farm/${farmId}`);
   };
 
-  const handleDeleteFarm = (id: number) => {
-    const updated = farms.filter(f => f.id !== id);
-    setFarms(updated);
-    const allFarms: Farm[] = JSON.parse(localStorage.getItem("allFarms") || "[]");
-    localStorage.setItem("allFarms", JSON.stringify(allFarms.filter(f => f.id !== id)));
-    toast.success("Farm deleted successfully!");
-  };
-
-  if (!farmer) return <p className="text-center mt-20 text-gray-500">No farmer logged in!</p>;
+  const farmerFarms = farms as FarmDetails[] | undefined;
 
   return (
-    <div className="min-h-screen flex">
-      <Toaster richColors position="top-center" closeButton />
+    <div className="container mx-auto p-4">
+      <div className="flex justify-between items-center mb-6">
+        <div>
+          <h1 className="text-2xl font-bold">Farmer Dashboard</h1>
+          <p className="text-gray-500">
+            {loadingUser
+              ? "fetching user..."
+              : user?.name
+              ? `Welcome, ${user.name}`
+              : "user not found"}
+          </p>
+        </div>
+        <Button onClick={() => setIsModalOpen(true)}>Add Farm</Button>
+      </div>
 
-      {/* Sidebar */}
-      <aside className="w-80 bg-white shadow-xl p-6 flex flex-col justify-between h-screen relative left-20">
-        <div className="flex flex-col gap-6">
-          <div className="flex items-center gap-3">
-            <div className="bg-green-700 text-white w-12 h-12 flex items-center justify-center rounded-full font-bold text-xl">
-              {farmer.firstName[0]}{farmer.lastName[0]}
-            </div>
-            <div>
-              <h2 className="font-bold text-lg text-green-700">{farmer.firstName} {farmer.lastName}</h2>
-              <p className="text-gray-500 text-sm">{farmer.location || "Unknown location"}</p>
-              <p className="text-gray-500 text-sm">{farmer.phone || "No phone"}</p>
-            </div>
+      <AddFarmModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        refetchFarms={refetchFarms}
+      />
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        <div className="bg-white border-2 border-amber-500/20 p-4 rounded-lg shadow">
+          <h2 className="text-lg font-semibold">Farms Listed</h2>
+          <p className="text-3xl font-bold">{(farmerFarms?.length || 0) + mockFarms.length}</p>
+        </div>
+        <div className="bg-white border-2 border-amber-500/20 p-4 rounded-lg shadow">
+          <h2 className="text-lg font-semibold">Investments Raised</h2>
+          <p className="text-3xl font-bold">${"totalInvestments"}</p>
+        </div>
+        <div className="bg-white border-2 border-amber-500/20 p-4 rounded-lg shadow">
+          <h2 className="text-lg font-semibold">Investors</h2>
+          <p className="text-3xl font-bold">{"totalInvestors"}</p>
+        </div>
+      </div>
+
+      <div>
+        <h2 className="text-xl font-bold mb-4">Your Farms</h2>
+        {loadingFarms ? (
+          <p>Loading farms...</p>
+        ) : (farmerFarms && farmerFarms.length > 0) || mockFarms.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {(farmerFarms || []).concat(mockFarms).map((farm) => (
+              farm && (
+                <ListingCard
+                  key={Number(farm.id)}
+                  title={`Farm #${Number(farm.id)}`}
+                  description={farm.description || ""}
+                  imageUrl={
+                    "https://images.pexels.com/photos/2889441/pexels-photo-2889441.jpeg?auto=compress&cs=tinysrgb&w=400"
+                  }
+                  actionText="View Details"
+                  onAction={() => handleNavigate(farm.id)}
+                >
+                  <div className="p-4">
+                    <p>Budget: {Number(farm.budget)}</p>
+                    <p>Total Invested: {Number(farm.totalInvested)}</p>
+                    <p>Is Funded: {farm.isFunded ? "Yes" : "No"}</p>
+                    <p>Is Completed: {farm.isCompleted ? "Yes" : "No"}</p>
+                  </div>
+                </ListingCard>
+              )
+            ))}
           </div>
-
-          <div className="space-y-2">
-            <p>Total Farms: {farms.length}</p>
-            <p>Total Shares: {farms.reduce((acc, f) => acc + f.totalShares, 0)}</p>
-            <p>Price per Share: ₦{farms.length ? farms[farms.length - 1].sharePrice : 0}</p>
+        ) : (
+          <div className="text-center py-10 border-2 border-dashed border-gray-300 rounded-lg">
+            <p className="text-gray-500">No farms listed yet.</p>
+            <Button onClick={() => setIsModalOpen(true)} className="mt-4">
+              Create a Farm
+            </Button>
           </div>
-        </div>
-      </aside>
-
-      <main className="flex-1 ml-16 mx-20 rounded-xl bg-green-100 p-6 min-h-screen">
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-3xl font-bold text-green-700">🌾 My Farms Dashboard</h1>
-          <button 
-            onClick={() => setShowAddFarm(true)}
-            className="flex items-center gap-2 bg-green-700 text-white py-2 px-4 rounded-full hover:bg-green-800 transition"
-          >
-            <Plus size={16} /> Add Farm
-          </button>
-        </div>
-
-        {/* Farms Grid */}
-        <div className="grid md:grid-cols-3 sm:grid-cols-2 gap-6">
-          {farms.length === 0 &&
-          <motion.div
-  className="col-span-full flex flex-col items-center justify-center mt-10 p-6 bg-green-50 rounded-2xl shadow-md"
-  initial={{ opacity: 0, y: 20 }}
-  animate={{ opacity: 1, y: 0 }}
-  transition={{ duration: 0.5 }}
->
-  <Leaf size={48} className="text-green-500 mb-4 animate-bounce" />
-  <h3 className="text-xl font-bold text-green-700 mb-2">No Farms Yet!</h3>
-  <p className="text-gray-500 text-center mb-4">
-    🌱 Start by adding your first farm to track growth, investors, and shares. Your farm dashboard will come alive here!
-  </p>
-  <button
-    onClick={() => setShowAddFarm(true)}
-    className="flex items-center gap-2 bg-green-700 text-white py-2 px-4 rounded-full hover:bg-green-800 transition"
-  >
-    <Plus size={16} /> Add First Farm
-  </button>
-</motion.div>
-
-        }
-          {farms.map(farm => (
-            <motion.div
-              key={farm.id}
-              className="bg-white p-4 rounded-2xl shadow-lg flex flex-col gap-3 hover:scale-105 transition-all cursor-pointer relative overflow-hidden"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
-            >
-              <div className="flex justify-between items-start">
-                <h3 className="font-semibold text-green-700 flex items-center gap-2"><Leaf size={18} /> {farm.name}</h3>
-                <button onClick={() => handleDeleteFarm(farm.id)} className="text-red-500 hover:text-red-700">
-                  <Trash2 size={18} />
-                </button>
-              </div>
-              <p className="text-gray-600">{farm.description}</p>
-
-              <motion.div className="w-full bg-gray-200 h-3 rounded-full mt-2 overflow-hidden">
-                <motion.div
-                  className={`h-3 rounded-full ${farm.growth >= 75 ? "bg-green-500 shadow-lg" : farm.growth >= 50 ? "bg-yellow-500" : "bg-gray-400"}`}
-                  initial={{ width: 0 }}
-                  animate={{ width: `${farm.growth}%` }}
-                  transition={{ duration: 1.5, ease: "easeOut" }}
-                />
-              </motion.div>
-              <p className="text-sm text-gray-500 mt-1">{farm.growth}% grown</p>
-              <p className="text-sm text-gray-500 mt-1">Price per Share: ₦{farm.sharePrice}</p>
-            </motion.div>
-          ))}
-        </div>
-      </main>
-
-      {/* Add Farm Modal */}
-      {showAddFarm && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <motion.div
-            className={`bg-white p-6 rounded-2xl shadow-xl w-full max-w-md flex flex-col gap-4 ${shake ? "animate-shake border-2 border-red-500" : ""}`}
-            initial={{ scale: 0.9, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ duration: 0.3 }}
-          >
-            <h2 className="text-xl font-bold text-green-700 text-center">Add New Farm</h2>
-
-            <div className="flex flex-col gap-4">
-              {/* Budget */}
-              <div className="flex flex-col gap-1">
-                <p className="text-sm text-gray-500">Set the total budget you plan to invest in this farm (in Naira).</p>
-                <div className="relative">
-                  <DollarSign size={16} className="absolute top-3 left-3 text-gray-400" />
-                  <input
-                    type="number"
-                    placeholder="Budget (₦)"
-                    value={budget}
-                    onChange={e => setBudget(Number(e.target.value))}
-                    className="w-full pl-10 p-2 border rounded-xl focus:outline-none focus:ring focus:ring-green-400"
-                  />
-                </div>
-              </div>
-
-              {/* Farm Size */}
-              <div className="flex flex-col gap-1">
-                <p className="text-sm text-gray-500">Enter the size of your farm in hectares.</p>
-                <div className="relative">
-                  <Layers size={16} className="absolute top-3 left-3 text-gray-400" />
-                  <input
-                    type="number"
-                    placeholder="Farm Size (hectares)"
-                    value={farmSize}
-                    onChange={e => setFarmSize(Number(e.target.value))}
-                    className="w-full pl-10 p-2 border rounded-xl focus:outline-none focus:ring focus:ring-green-400"
-                  />
-                </div>
-              </div>
-
-              {/* Total Shares */}
-              <div className="flex flex-col gap-1">
-                <p className="text-sm text-gray-500">Number of shares you want to divide your farm into for investors.</p>
-                <div className="relative">
-                  <DollarSign size={16} className="absolute top-3 left-3 text-gray-400" />
-                  <input
-                    type="number"
-                    placeholder="Total Shares"
-                    value={totalShares}
-                    onChange={e => setTotalShares(Number(e.target.value))}
-                    className="w-full pl-10 p-2 border rounded-xl focus:outline-none focus:ring focus:ring-green-400"
-                  />
-                </div>
-              </div>
-
-              {/* Duration Days */}
-              <div className="flex flex-col gap-1">
-                <p className="text-sm text-gray-500">Duration of your farm project in days.</p>
-                <div className="relative">
-                  <MapPin size={16} className="absolute top-3 left-3 text-gray-400" />
-                  <input
-                    type="number"
-                    placeholder="Duration (Days)"
-                    value={durationDays}
-                    onChange={e => setDurationDays(Number(e.target.value))}
-                    className="w-full pl-10 p-2 border rounded-xl focus:outline-none focus:ring focus:ring-green-400"
-                  />
-                </div>
-              </div>
-
-              {/* Description */}
-              <div className="flex flex-col gap-1">
-                <p className="text-sm text-gray-500">Write a brief description of your farm, crops, or special notes for investors.</p>
-                <div className="relative">
-                  <User size={16} className="absolute top-3 left-3 text-gray-400" />
-                  <textarea
-                    placeholder="Description"
-                    value={description}
-                    onChange={e => setDescription(e.target.value)}
-                    className="w-full pl-10 p-2 border rounded-xl focus:outline-none focus:ring focus:ring-green-400"
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* Buttons */}
-            <div className="flex gap-4 mt-2">
-              <button
-                onClick={() => setShowAddFarm(false)}
-                className="flex-1 bg-gray-400 text-white py-2 rounded-xl hover:bg-gray-500 transition"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleAddFarm}
-                className="flex-1 bg-green-700 text-white py-2 rounded-xl hover:bg-green-800 transition flex items-center justify-center gap-2"
-              >
-                {loading ? (
-                  <>
-                    <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4l3-3-3-3v4a8 8 0 100 16v-4l-3 3 3 3v-4a8 8 0 01-8-8z"/>
-                    </svg>
-                    Evaluating...
-                  </>
-                ) : "Add Farm"}
-              </button>
-            </div>
-          </motion.div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
-}
+};
+
+export default FarmerDashboard;

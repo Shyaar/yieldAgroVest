@@ -10,9 +10,11 @@ export default function Register() {
   const [firstName, setFirstName] = useState<string>("");
   const [lastName, setLastName] = useState<string>("");
   const [role, setRole] = useState<number | null>(null);
+  const [displayRole, setDisplayRole] = useState("");
   const [isModalOpen, setIsModalOpen] = useState<boolean>(true);
 
-  const { registerUser, isPending, isConfirming, isConfirmed, error } = useUserActions();
+  const { registerUser, isPending, isConfirming, isConfirmed, error } =
+    useUserActions();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -25,8 +27,14 @@ export default function Register() {
     if (isConfirmed) {
       toast.success("User registered successfully!");
       if (role === 0) {
+        setTimeout(() => {
+          setIsModalOpen(true);
+        }, 2000);
         navigate("/farmers/dashboard");
       } else if (role === 1) {
+        setTimeout(() => {
+          setIsModalOpen(true);
+        }, 2000);
         navigate("/investors/dashboard");
       }
     }
@@ -54,7 +62,13 @@ export default function Register() {
       toast.error("Please fill in all fields.");
       return;
     }
-
+    setFirstName(firstName);
+    setLastName(lastName);
+    if (role === 0) {
+      setDisplayRole("Investor");
+    } else if (role === 1) {
+      setDisplayRole("Farmer");
+    }
     registerUser(firstName, lastName, role);
   };
 
@@ -74,6 +88,8 @@ export default function Register() {
   const getLoadingMessage = () => {
     if (isPending) return "Waiting for wallet confirmation...";
     if (isConfirming) return "Confirming transaction...";
+    if (isConfirmed)
+      return `Registration complete ${firstName} ${lastName} ${displayRole}`;
     return "";
   };
 
@@ -91,7 +107,9 @@ export default function Register() {
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="rounded-md shadow-sm -space-y-px">
             <div className="mb-4">
-              <label htmlFor="firstName" className="sr-only">First Name</label>
+              <label htmlFor="firstName" className="sr-only">
+                First Name
+              </label>
               <input
                 id="firstName"
                 name="firstName"
@@ -105,7 +123,9 @@ export default function Register() {
               />
             </div>
             <div className="mb-4">
-              <label htmlFor="lastName" className="sr-only">Last Name</label>
+              <label htmlFor="lastName" className="sr-only">
+                Last Name
+              </label>
               <input
                 id="lastName"
                 name="lastName"
@@ -121,16 +141,31 @@ export default function Register() {
           </div>
 
           <div className="mb-6">
-            <label htmlFor="role" className="block text-sm font-medium text-gray-700">Selected Role</label>
+            <label
+              htmlFor="role"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Selected Role
+            </label>
             <div className="mt-1 flex items-center justify-between p-2 border border-gray-300 rounded-md shadow-sm bg-gray-50">
-              <span className="text-gray-900 font-semibold">{getRoleName(role)}</span>
+              <span className="text-gray-900 font-semibold">
+                {getRoleName(role)}
+              </span>
               {role === null && (
-                <Button type="button" onClick={() => setIsModalOpen(true)} variant="secondary">
+                <Button
+                  type="button"
+                  onClick={() => setIsModalOpen(true)}
+                  variant="secondary"
+                >
                   Select Role
                 </Button>
               )}
               {role !== null && (
-                <Button type="button" onClick={() => setIsModalOpen(true)} variant="secondary">
+                <Button
+                  type="button"
+                  onClick={() => setIsModalOpen(true)}
+                  variant="secondary"
+                >
                   Change Role
                 </Button>
               )}

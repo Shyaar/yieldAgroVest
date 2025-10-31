@@ -8,9 +8,10 @@ import InvestorKyc from "./pages/investors/InvestorKyc";
 import Footer from "./components/layout/Footer";
 import FarmerDashboard from "./pages/farmers/FarmerDashboard";
 import InvestorDashboard from "./pages/investors/InvestorDashboard";
+import FarmDetails from "./pages/farmers/FarmDetails";
+
 // import AddFarm from "./pages/farmers/AddFarm"; // Uncommented and added
 // import ListFarm from "./pages/farmers/ListFarm"; // Added
-// // import FarmDetails from "./pages/farmers/FarmDetails";
 
 
 import "./App.css";
@@ -33,7 +34,7 @@ function App() {
         <Route path="/investors/kyc" element={<InvestorKyc />} />
         <Route path="/farmers/dashboard" element={<FarmerDashboard />} />
         <Route path="/investors/dashboard" element={<InvestorDashboard />} />
-        {/* <Route path="/farm/:farmId" element={<FarmDetails />} /> */}
+        <Route path="/farm/:farmId" element={<FarmDetails />} />
       </Routes>
       <Footer />
     </div>
