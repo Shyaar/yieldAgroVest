@@ -141,7 +141,7 @@ const FarmerDashboard = () => {
         </div>
         <div className="bg-white border-2 border-amber-500/20 p-4 rounded-lg shadow">
           <h2 className="text-lg font-semibold">Investments Raised</h2>
-          <p className="text-3xl font-bold">${"totalInvestments"}</p>
+          <p className="text-3xl font-bold">{"totalInvestments"} HBAR</p>
         </div>
         <div className="bg-white border-2 border-amber-500/20 p-4 rounded-lg shadow">
           <h2 className="text-lg font-semibold">Investors</h2>

@@ -1,9 +1,9 @@
 import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAccount } from 'wagmi';
-import { Button } from '../../components/ui/Button'; // Assuming Button is needed for Unlist
+import { Button } from '../../components/ui/Button';
 
-const FarmDetails: React.FC = () => {
+const InvestorFarmDetails: React.FC = () => {
   const { farmId } = useParams<{ farmId: string }>();
   const { address, isConnected } = useAccount();
   const navigate = useNavigate();
@@ -50,7 +50,7 @@ const FarmDetails: React.FC = () => {
     return <div className="container mx-auto p-4">Farm not found.</div>;
   }
 
-  const isFarmOwner = address === farmBasicDetails.farmer;
+  // const isFarmOwner = address === farmBasicDetails.farmer; // Not needed for investor view
 
   return (
     <div className="container mx-auto p-4">
@@ -59,19 +59,19 @@ const FarmDetails: React.FC = () => {
       </Button>
       <h1 className="text-3xl font-bold mb-4">Farm Details</h1>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6 p-5 bg-white">
-        <div className=" rounded-lg p-6">
-          <img src={farmBasicDetails.imageUrl} alt={farmBasicDetails.description} className="w-full h-full object-cover rounded-lg mb-4" />
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+        <div className="bg-white shadow-md rounded-lg p-6">
+          <img src={farmBasicDetails.imageUrl} alt={farmBasicDetails.description} className="w-full h-64 object-cover rounded-lg mb-4" />
         </div>
-        <div className=" rounded-lg p-6">
+        <div className="bg-white shadow-md rounded-lg p-6">
           <h2 className="text-2xl font-semibold mb-3">Basic Information</h2>
           <p><strong>Farm ID:</strong> {farmBasicDetails.id.toString()}</p>
           <p><strong>Farmer:</strong> {farmBasicDetails.farmer}</p>
-          <p><strong>Budget:</strong> {farmBasicDetails.budget.toString()} HBAR</p>
+          <p><strong>Budget:</strong> {farmBasicDetails.budget.toString()}</p>
           <p><strong>Farm Size:</strong> {farmBasicDetails.farmSize.toString()}</p>
           <p><strong>Total Shares:</strong> {farmBasicDetails.totalShares.toString()}</p>
-          <p><strong>Share Price:</strong> {farmBasicDetails.sharePrice.toString()} HBAR</p>
-          <p><strong>Total Invested:</strong> {farmBasicDetails.totalInvested.toString()} HBAR</p>
+          <p><strong>Share Price:</strong> {farmBasicDetails.sharePrice.toString()}</p>
+          <p><strong>Total Invested:</strong> {farmBasicDetails.totalInvested.toString()}</p>
           <p><strong>Description:</strong> {farmBasicDetails.description}</p>
           <p><strong>Funded:</strong> {farmBasicDetails.isFunded ? 'Yes' : 'No'}</p>
           <p><strong>Completed:</strong> {farmBasicDetails.isCompleted ? 'Yes' : 'No'}</p>
@@ -107,24 +107,16 @@ const FarmDetails: React.FC = () => {
         )}
       </div>
 
-      {isFarmOwner && !farmBasicDetails.isCompleted && (
-        <div className="bg-white shadow-md rounded-lg p-6 mb-6 flex justify-end">
-          <Button
-            disabled
-            className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded disabled:opacity-50"
-          >
-            Release Next Milestone
-          </Button>
-          <Button
-            disabled
-            className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded ml-4 disabled:opacity-50"
-          >
-            Unlist Farm
-          </Button>
-        </div>
-      )}
+      <div className="bg-white shadow-md rounded-lg p-6 mb-6 flex justify-end">
+        <Button
+          disabled
+          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded disabled:opacity-50"
+        >
+          Buy Shares
+        </Button>
+      </div>
     </div>
   );
 };
 
-export default FarmDetails;
+export default InvestorFarmDetails;
