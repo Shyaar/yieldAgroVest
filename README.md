@@ -40,6 +40,8 @@ A blockchain-powered agro-finance platform that:
 
 ## Ongoing Development
 -  **Insurance Integration**: Farmers can opt-in for insurance with whitelisted providers to build credibility and protect against risks.
+-  **IPFS metaData generation**: Creating and minting NFTs to farmers on creating farm listing and to investors on buying shares.
+-  **FrontEnd Integration**: fully integrate the front end for better user experience.
 
 ---
 
@@ -56,6 +58,14 @@ A blockchain-powered agro-finance platform that:
 -  **Farm-to-Farm Investment**: Farmers can buy shares from other farms.  
 
 ---
+
+## How It Works
+- Farmers register and verify farms on-chain.
+- Investors browse and fund verified farms.
+- Funds are held in escrow smart contracts.
+- Milestone-based disbursement ensures accountability.
+- Investors can monitor progress and ROI through the dashboard.
+
 
 ## Roadmap
 **MVP → Scale**
@@ -90,6 +100,12 @@ A blockchain-powered agro-finance platform that:
 - **Blockchain** – Ethereum/Polygon  
 
 ---
+
+## Demo, Certificate & Presentation
+
+- **Deployed Link:** https://yield-agro-vest-3vas.vercel.app/
+- **Certificate:** [View PDF](https://certs.hashgraphdev.com/10b8c73e-8ace-45a0-ac12-aee8ed661111.pdf)
+- **Pitch Deck:** [View on Canva](https://www.canva.com/design/DAGwt2IoKt8/68gsdVhHhoJZcClJU4hb3A/view?utlId=h100a000b9c#1)
 
 ##  Contributing
 We welcome contributions from developers, designers, and agri-tech enthusiasts.  
