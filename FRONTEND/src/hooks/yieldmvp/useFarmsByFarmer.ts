@@ -1,4 +1,5 @@
 import { useReadContract, useReadContracts, useAccount } from "wagmi";
+import { type Abi } from "viem";
 import yieldMvpABI from "../../../abi/yieldMVP.json";
 
 const yieldMvpAddress = import.meta.env.VITE_YIELD_MVP_CONTRACT_ADDRESS as `0x${string}`;
@@ -8,7 +9,7 @@ export function useFarmsByFarmer(farmerAddress?: `0x${string}`) {
 
   const { data: farmIds, isLoading: loadingFarmIds } = useReadContract({
     address: yieldMvpAddress,
-    abi: yieldMvpABI,
+    abi: yieldMvpABI as Abi,
     functionName: "getFarmsByFarmer",
     args: farmerAddress ? [farmerAddress] : undefined,
     query: { enabled: !!farmerAddress && isConnected },
@@ -16,7 +17,7 @@ export function useFarmsByFarmer(farmerAddress?: `0x${string}`) {
 
   const farmContracts = (farmIds as bigint[] | undefined)?.map(id => ({
     address: yieldMvpAddress,
-    abi: yieldMvpABI,
+    abi: yieldMvpABI as Abi,
     functionName: 'getFarmBasicDetails',
     args: [id],
   }));

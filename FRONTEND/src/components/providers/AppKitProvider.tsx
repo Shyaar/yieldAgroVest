@@ -1,8 +1,9 @@
+import React from 'react'
 import { createAppKit } from '@reown/appkit/react'
 import { WagmiProvider } from 'wagmi'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { WagmiAdapter } from '@reown/appkit-adapter-wagmi'
-import { hederaTestnet } from '@reown/appkit/networks'
+import { hederaTestnet, type AppKitNetwork } from '@reown/appkit/networks'
 
 const queryClient = new QueryClient()
 
@@ -16,7 +17,7 @@ const metadata = {
 }
 
 // ✅ 1. Use hederaTestnet network (EVM-compatible)
-const networks = [hederaTestnet] as const
+const networks = [hederaTestnet] as [AppKitNetwork, ...AppKitNetwork[]]
 
 // ✅ 2. Create the Wagmi adapter
 const wagmiAdapter = new WagmiAdapter({
@@ -35,7 +36,7 @@ createAppKit({
   themeMode: 'light',
 })
 
-export function AppKitProvider({ children }) {
+export function AppKitProvider({ children }: { children: React.ReactNode }) {
   return (
     <WagmiProvider config={wagmiAdapter.wagmiConfig}>
       <QueryClientProvider client={queryClient}>

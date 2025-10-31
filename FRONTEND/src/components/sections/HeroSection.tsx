@@ -1,10 +1,10 @@
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ArrowRight, Lightbulb } from "lucide-react";
 import { toast } from "react-toastify";
 import { Badge } from "../ui/Badge";
 import { ImageCard } from "../ui/ImageCard";
 import { useAccount, useConnect } from "wagmi";
-import useUsersStore from "../../store/usersStore";
+import useUsersStore, { type User } from "../../store/usersStore";
 import LoadingModal from "../ui/modals/LoadingModal";
 import { useSingleUser } from "../../hooks/user/useUserRegistry";
 import { useNavigate } from "react-router-dom";
@@ -20,15 +20,15 @@ const { connectAsync, connectors } = useConnect();
 const { address, isConnected } = useAccount();
 const { setCurrentUser } = useUsersStore();
 
-const { user, loadingUser, refetchUser } = useSingleUser(address);
+const { refetchUser } = useSingleUser(address);
 const hasInitialized = useRef(false);
 
 // 🔹 Safe wrapper to catch UserNotFound revert
 async function safeRefetchUser(): Promise<User | null> {
   try {
     const result = await refetchUser(); // async function from the hook
-    return result.data 
-  } catch (err: unknown) {
+    return result.data as User | null;
+  } catch (err: any) {
     if (
       err?.cause?.name === "ContractFunctionRevertedError" &&
       err.cause?.error?.message?.includes("UserNotFound")
@@ -67,7 +67,7 @@ async function initializeUser() {
 
     // User exists
     const { firstName, lastName, role, isRegistered } = userData;
-    const formattedRole = role === 0 ? "investor" : "farmer";
+    const formattedRole = role === "investor" ? "investor" : "farmer";
 
     setCurrentUser({
       walletAddress: address,
@@ -78,7 +78,7 @@ async function initializeUser() {
     });
 
     toast.success(`Welcome back, ${firstName || "user"}!`);
-    navigate(formattedRole === "farmer" ? "/farmer" : "/investor");
+    navigate(formattedRole === "farmer" ? "farmers/dashboard" : "/investors/browse");
   } catch (err: unknown) {
     console.error("⚠️ Unexpected error:", err);
     toast.error("Something went wrong while fetching your data.");

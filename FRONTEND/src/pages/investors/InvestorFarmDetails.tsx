@@ -1,11 +1,10 @@
-import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAccount } from 'wagmi';
 import { Button } from '../../components/ui/Button';
 
 const InvestorFarmDetails: React.FC = () => {
   const { farmId } = useParams<{ farmId: string }>();
-  const { address, isConnected } = useAccount();
+  const { isConnected } = useAccount();
   const navigate = useNavigate();
 
   const mockFarm = {

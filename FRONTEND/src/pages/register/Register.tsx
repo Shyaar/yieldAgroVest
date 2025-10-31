@@ -1,15 +1,16 @@
-import React, { useState, FormEvent, useEffect } from "react";
+import { useState, useEffect, type FormEvent } from "react";
 import { RoleSelectionModal } from "../../components/ui/modals/RoleSelectionModal";
 import { Button } from "../../components/ui/Button";
 import { toast } from "react-toastify";
 import { useUserActions } from "../../hooks/user/useUserActions";
 import LoadingModal from "../../components/ui/modals/LoadingModal";
 import { useNavigate } from "react-router-dom";
+import { Role } from "../../hooks/user/useUserRegistry";
 
 export default function Register() {
   const [firstName, setFirstName] = useState<string>("");
   const [lastName, setLastName] = useState<string>("");
-  const [role, setRole] = useState<number | null>(null);
+  const [role, setRole] = useState<Role | null>(null);
   const [displayRole, setDisplayRole] = useState("");
   const [isModalOpen, setIsModalOpen] = useState<boolean>(true);
 
@@ -46,7 +47,7 @@ export default function Register() {
     }
   }, [error]);
 
-  const handleRoleSelect = (selectedRole: number) => {
+  const handleRoleSelect = (selectedRole: Role) => {
     setRole(selectedRole);
     setIsModalOpen(false);
     toast.success(`Role selected: ${getRoleName(selectedRole)}`);

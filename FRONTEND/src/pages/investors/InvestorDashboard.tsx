@@ -2,7 +2,7 @@ import { useAccount } from "wagmi";
 import { Button } from "../../components/ui/Button";
 import ListingCard from "../../components/ui/ListingCard";
 import { useSingleUser } from "../../hooks/user/useUserRegistry";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useFarmsByFarmer } from "../../hooks/yieldmvp/useFarmsByFarmer";
 import { useNavigate } from "react-router-dom";
 
@@ -30,7 +30,7 @@ const InvestorDashboard = () => {
   const { user, loadingUser, refetchUser } = useSingleUser(
     isConnected ? address : undefined
   );
-  const { farms, loadingFarms, refetchFarms } = useFarmsByFarmer(address);
+  const { farms, loadingFarms } = useFarmsByFarmer(address);
   const navigate = useNavigate();
 
   // Mock data for demonstration

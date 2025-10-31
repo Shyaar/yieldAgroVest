@@ -1,5 +1,4 @@
-import React from 'react';
-import { Sprout, Mail, Phone, MapPin } from 'lucide-react';
+import { Mail, Phone, MapPin } from 'lucide-react';
 
 const Footer = () => {
   return (

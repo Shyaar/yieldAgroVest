@@ -1,17 +1,18 @@
 
-import React from 'react';
 import { X, Tractor, Briefcase } from 'lucide-react';
+
+type Role = 0 | 1;
 
 interface RoleSelectionModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSelectRole: (role: number) => void; // New prop to pass selected role
+  onSelectRole: (role: Role) => void; // New prop to pass selected role
 }
 
 export const RoleSelectionModal: React.FC<RoleSelectionModalProps> = ({ isOpen, onClose, onSelectRole }) => {
   if (!isOpen) return null;
 
-  const handleRoleSelect = (role: number) => {
+  const handleRoleSelect = (role: Role) => {
     onSelectRole(role);
     onClose();
   };

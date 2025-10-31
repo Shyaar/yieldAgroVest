@@ -1,5 +1,5 @@
 
-import { FC, ReactNode } from "react";
+import type { FC, ReactNode } from "react";
 import { Button } from "./Button";
 
 interface ListingCardProps {

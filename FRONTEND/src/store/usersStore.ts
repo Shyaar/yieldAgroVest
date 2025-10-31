@@ -1,6 +1,6 @@
 import { create } from "zustand";
 
-interface User {
+export interface User {
   walletAddress: string;
   role: "farmer" | "investor" | null;
   isRegistered: boolean;

@@ -1,7 +1,6 @@
-import { FC, useState, ChangeEvent, FormEvent } from "react";
+import { useState, type ChangeEvent, type FormEvent, type FC } from "react";
 import { Button } from "../Button";
 import { useYieldMvpActions } from "../../../hooks/yieldmvp/useYieldMvpActions";
-import { uploadToIpfs, generateFarmMetadata } from "../../../utils/farmipfs";
 import LoadingModal from "./LoadingModal/index";
 import generateAvatarFromAddress from "../../../lib/generateAvatar";
 import { useAccount } from "wagmi";

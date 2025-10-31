@@ -1,4 +1,3 @@
-import React from "react";
 import { User, Users, FileCheck, Calendar, Banknote } from "lucide-react";
 import { motion } from "framer-motion";
 
