@@ -1,8 +1,7 @@
 import { Routes, Route } from "react-router-dom";
 import NavBar from "./components/layout/NavBar";
 import Home from "./pages/Home";
-import FarmerRegister from "./pages/farmers/Register";
-import InvestorRegister from "./pages/investors/Register"; // Uncommented and added
+import FarmerRegister from "./pages/register/Register"; // Uncommented and added
 import InvestorBrowse from "./pages/investors/Browse";
 // import FarmerKyc from "./pages/farmers/FarmerKyc";
 import InvestorKyc from "./pages/investors/InvestorKyc";
@@ -15,6 +14,7 @@ import InvestorDashboard from "./pages/investors/InvestorDashboard";
 
 
 import "./App.css";
+import Register from "./pages/register/Register";
 
 
 function App() {
@@ -25,7 +25,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/farmers/register" element={<FarmerRegister />} />
-        <Route path="/investors/register" element={<InvestorRegister />} /> 
+        <Route path="/register/Register" element={<Register />} /> 
         <Route path="/investors/browse" element={<InvestorBrowse />} />
         {/* <Route path="/farmers/add-farm" element={<AddFarm />} />  */}
         {/* <Route path="/farmers/list-farm" element={<ListFarm />} />  */}

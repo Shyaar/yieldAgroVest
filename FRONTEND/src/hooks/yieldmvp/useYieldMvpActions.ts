@@ -9,7 +9,7 @@ export function useYieldMvpActions() {
     hash: txHash,
   });
 
-  const yieldMvpContractAddress = process.env.NEXT_PUBLIC_YIELD_MVP_CONTRACT_ADDRESS as `0x${string}`;
+  const yieldMvpContractAddress = import.meta.env.VITE_YIELD_MVP_CONTRACT_ADDRESS as `0x${string}`;
 
   const createFarm = (
     budget: bigint,

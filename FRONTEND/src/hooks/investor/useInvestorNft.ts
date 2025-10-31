@@ -1,7 +1,7 @@
 import { useReadContract, useAccount } from "wagmi";
 import investorNftABI from "../../../abi/investorNft.json";
 
-const CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_INVESTOR_NFT_CONTRACT_ADDRESS as `0x${string}`;
+const investorNftAddress = import.meta.env.VITE_INVESTOR_NFT_CONTRACT_ADDRESS as `0x${string}`;
 
 // ------------------ 1️⃣ useInvestmentData ------------------
 export function useInvestmentData(tokenId?: number) {
@@ -13,7 +13,7 @@ export function useInvestmentData(tokenId?: number) {
     isError,
     refetch,
   } = useReadContract({
-    address: CONTRACT_ADDRESS,
+    address: investorNftAddress,
     abi: investorNftABI,
     functionName: "getInvestmentData",
     args: tokenId !== undefined ? [tokenId] : undefined,
@@ -38,7 +38,7 @@ export function useInvestorInvestments(investorAddress?: `0x${string}`) {
     isError,
     refetch,
   } = useReadContract({
-    address: CONTRACT_ADDRESS,
+    address: investorNftAddress,
     abi: investorNftABI,
     functionName: "getInvestorInvestmentsWithMetadata",
     args: investorAddress ? [investorAddress] : undefined,

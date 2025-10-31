@@ -1,269 +1,158 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Leaf, ArrowRight, Lightbulb } from "lucide-react";
+import { ArrowRight, Lightbulb } from "lucide-react";
 import { toast } from "react-toastify";
 import { Badge } from "../ui/Badge";
 import { ImageCard } from "../ui/ImageCard";
-import { RoleSelectionModal } from "../ui/modals/RoleSelectionModal";
 import { useAccount, useConnect } from "wagmi";
-import useUserRoleStore from "../../store/useUserRoleStore";
+import useUsersStore from "../../store/usersStore";
 import LoadingModal from "../ui/modals/LoadingModal";
 import { useSingleUser } from "../../hooks/user/useUserRegistry";
+import { useNavigate } from "react-router-dom";
 
 export const HeroSection: React.FC = () => {
-  const [isModalOpenRegister, setIsModalOpenRegister] = useState(false);
-  const [isModalOpenLoading, setIsModalOpenLoading] = useState(false);
-  // const router = useRouteError();
-  const [modalMessage, setModalMessage] = useState("");
-  const { connectAsync, connectors } = useConnect();
-  const { address, isConnected } = useAccount();
-  
-  const { user, loadingUser, errorUser, refetchUser} = useSingleUser()
 
-  const { setUser } = useUserRoleStore();
 
-  const hasRegistered = useRef(false);
+const [isModalOpenLoading, setIsModalOpenLoading] = useState(false);
+const [modalMessage, setModalMessage] = useState("");
 
-  useEffect(() => {
-     if (isConnected) initializeUser();
- 
-     if (isConnected && loadingUser) {
-       setIsModalOpenLoading(true);
-       setModalMessage("Please wait... the sun is warming up!! 🌞");
-     }
-    //   else if ((isConnected && loadingUser) || isConfirming) {
-    //    setIsModalOpenRegister(true);
-    //    setModalMessage("Please wait while we create your account...");
-    //  } else if ((isConnected && isConfirmed) || writeError) {
-    //    setIsModalOpenRegister(false);
-    //  }
-   },[
-   user,
-      loadingUser,
-      errorUser,
-      refetchUser,
-      isConnected
-   ]);
+const navigate = useNavigate();
+const { connectAsync, connectors } = useConnect();
+const { address, isConnected } = useAccount();
+const { setCurrentUser } = useUsersStore();
 
-  async function initializeUser() {
-    // if (isLoading || hasRegistered.current) return;
+const { user, loadingUser, refetchUser } = useSingleUser(address);
+const hasInitialized = useRef(false);
 
-    if (!isConnected || !address) {
-      toast.info("Connecting wallet...");
-      try {
-        const injected = connectors.find((c) => c.id === "injected");
-        if (!injected) throw new Error("No wallet found");
-        const { accounts } = await connectAsync({ connector: injected });
-        toast.success(`Connected: ${accounts[0].slice(0, 6)}...`);
-        return;
-      } catch {
-        toast.error("Wallet connection failed");
-        return;
-      }
+// 🔹 Safe wrapper to catch UserNotFound revert
+async function safeRefetchUser(): Promise<User | null> {
+  try {
+    const result = await refetchUser(); // async function from the hook
+    return result.data 
+  } catch (err: unknown) {
+    if (
+      err?.cause?.name === "ContractFunctionRevertedError" &&
+      err.cause?.error?.message?.includes("UserNotFound")
+    ) {
+      return null; // user does not exist
     }
+    throw err; // any other error
+  }
+}
 
-    // if (isRegistered && userData) {
-    //   const { name, avatar } = userData;
-    //   setUser(name, avatar);
-    //   toast.success(`Welcome back, ${name}!`);
-    //   setShowModal(false);
-    //   router.push("/discover");
-    //   return;
-    // }
-
-    // if (!isRegistered && !hasRegistered.current) {
-    //   hasRegistered.current = true;
-    //   const name = generateRandomNameFromAddress(address);
-    //   const avatar = generateAvatarFromAddress(address);
-
-    //   setUser(name, avatar);
-    //   toast.info("New user detected, registering...");
-    //   setShowModal(true);
-    //   setModalMessage("Please wait while we create your account...");
-
-    //   try {
-    //     await register(name, avatar);
-    //     // toast.success(`Welcome, ${name}!`);
-    //     router.push("/userRegistered");
-    //   } catch (err) {
-    //     toast.error("Registration failed");
-    //   } finally {
-    //     setShowModal(false);
-    //   }
-    // }
+async function initializeUser() {
+  if (!isConnected || !address) {
+    toast.info("Please connect your wallet first.");
+    try {
+      const injected = connectors.find((c) => c.id === "injected");
+      if (!injected) throw new Error("No wallet found");
+      const { accounts } = await connectAsync({ connector: injected });
+      toast.success(`Connected: ${accounts[0].slice(0, 6)}...`);
+    } catch {
+      toast.error("Wallet connection failed");
+    }
+    return;
   }
 
-  console.log("this is address connected :", address);
-  // const [swapped, setSwapped] = useState(false);
+  setIsModalOpenLoading(true);
+  setModalMessage("Fetching your profile...");
 
-  const mainTags = [
-    "Innovative Agriculture",
-    "Sustainable Farming",
-    "Eco-friendly Solutions",
-    "Future of Farming",
-    "Green Technology",
-  ];
+  try {
+    const userData = await safeRefetchUser(); // use safe wrapper
+
+    if (!userData) {
+      // User does not exist
+      navigate("./register/Register")
+      return;
+    }
+
+    // User exists
+    const { firstName, lastName, role, isRegistered } = userData;
+    const formattedRole = role === 0 ? "investor" : "farmer";
+
+    setCurrentUser({
+      walletAddress: address,
+      firstName,
+      lastName,
+      role: formattedRole,
+      isRegistered,
+    });
+
+    toast.success(`Welcome back, ${firstName || "user"}!`);
+    navigate(formattedRole === "farmer" ? "/farmer" : "/investor");
+  } catch (err: unknown) {
+    console.error("⚠️ Unexpected error:", err);
+    toast.error("Something went wrong while fetching your data.");
+  } finally {
+    setIsModalOpenLoading(false);
+  }
+}
+
+useEffect(() => {
+  if (isConnected && !hasInitialized.current) {
+    hasInitialized.current = true;
+    initializeUser();
+  }
+}, [isConnected, address]);
+
 
   return (
-    <section className="min-h-screen bg-gradient-to-b from green-50 via-green-100 to-green-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-7xl mx-auto">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
-          {/* Left Content */}
-          <div className="space-y-8">
-            <Badge variant="success">Empowering Modern Agriculture</Badge>
+    <section className="min-h-screen bg-gradient-to-b from-green-50 via-green-100 to-green-50 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+        {/* LEFT SIDE */}
+        <div className="space-y-8">
+          <Badge variant="success">Empowering Modern Agriculture</Badge>
 
-            <div className="space-y-6">
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 leading-tight">
-                Empowering <br />
-                <div className="flex items-center gap-2">
-                  <span className="inline-flex items-center gap-2">
-                    farmers with
-                  </span>
-
-                  <span className="flex items-center space-x-0 relative overflow-hidden">
-                    <div className="relative w-14 h-14 rounded-full border-2 border-green-600 animate-slideLeft flex items-center justify-center"></div>
-
-                    {/* Leaf Icon */}
-                    <div className="relative w-14 h-14 rounded-full bg-green-600 text-white animate-slideRight flex items-center justify-center">
-                      <Leaf className="w-7 h-7" />
-                    </div>
-                  </span>
-
-                  {/* Custom Animation Styles */}
-                  <style>{`
-        @keyframes slideLeft {
-          0% { transform: translateX(0); background-color: transparent; }
-          50% { transform: translateX(3.5rem); background-color: #16a34a; } /* green-600 */
-          100% { transform: translateX(0); background-color: transparent; }
-        }
-
-        @keyframes slideRight {
-          0% { transform: translateX(0); background-color: #16a34a; }
-          50% { transform: translateX(-3.5rem); background-color: transparent; color: #16a34a; }
-          100% { transform: translateX(0); background-color: #16a34a; color: white; }
-        }
-
-        .animate-slideLeft {
-          animation: slideLeft 3s infinite ease-in-out;
-        }
-
-        .animate-slideRight {
-          animation: slideRight 3s infinite ease-in-out;
-        }
-      `}</style>
-                </div>
-                easy financing{" "}
-              </h1>
-
-              <p>
-                Connects verified farmers with investors, ensures
-                milestone-based funding, and builds trust through ratings and
-                transparent progress tracking.
-              </p>
-            </div>
-
-            <div className="flex flex-col sm:flex-row gap-4">
-              {/* Get Started Today Button */}
-              <button
-                onClick={() => initializeUser()}
-                className="relative overflow-hidden  bg-gradient-to-r from-green-700 via-green-600 to-emerald-500 text-white px-8 py-3 rounded-full transition-all duration-500 flex items-center justify-between space-x-3 group shadow-lg"
-              >
-                {/* Glow effect */}
-                <span className="absolute inset-0 rounded-full bg-gradient-to-r from-green-500 via-emerald-400 to-green-300 opacity-50 blur-2xl group-hover:opacity-80 group-hover:blur-3xl transition-all duration-700"></span>
-                {/* Shine overlay */}
-                <span className="absolute -left-20 top-0 h-full w-20 bg-white/20 rotate-12 group-hover:left-[130%] transition-all duration-700 ease-in-out"></span>
-
-                <span className="relative z-10 font-semibold tracking-wide group-hover:tracking-wider transition-all duration-500">
-                  Get Started Today
-                </span>
-
-                {/* Arrow in Circle */}
-                <div className="relative z-10 bg-white rounded-full p-2 flex items-center justify-center group-hover:scale-110 transition-transform duration-500">
-                  <ArrowRight
-                    size={22}
-                    className="text-green-600 group-hover:translate-x-1 transition-transform duration-500"
-                  />
-                </div>
-              </button>
-
-              {/* How It Works Button */}
-              <a
-                href="#"
-                className="group flex items-center relative py-3 px-6 rounded-full bg-green-600/10 hover:bg-green-600/20 transition-all duration-500 ease-in-out shadow-md"
-              >
-                <div className="flex items-center">
-                  <div className="bg-green-600 p-2 rounded-full flex items-center justify-center group-hover:rotate-12 transition-transform duration-500">
-                    <Lightbulb
-                      size={20}
-                      className="text-white transition-all duration-500"
-                    />
-                  </div>
-                  <span className="ml-3 font-medium text-green-800 group-hover:text-green-900 transition-colors duration-500">
-                    How it works
-                  </span>
-                </div>
-              </a>
-            </div>
+          <div className="space-y-6">
+            <h1 className="text-5xl font-bold text-gray-900 leading-tight">
+              Empowering farmers with easy financing
+            </h1>
+            <p>
+              Connect verified farmers with investors, ensure milestone-based
+              funding, and build trust through transparent progress tracking.
+            </p>
           </div>
 
-          {/* Right Image Grid */}
-          <div className="grid grid-cols-2 gap-4 h-[600px]">
-            {/* Large main image */}
-            <div className="col-span-2 h-2/3">
-              <ImageCard
-                src="https://images.pexels.com/photos/974314/pexels-photo-974314.jpeg?auto=compress&cs=tinysrgb&w=800"
-                alt="Aerial view of sustainable farmland"
-                className="h-full"
-                tags={mainTags.slice(0, 3)}
-              />
-            </div>
+          <div className="flex flex-col sm:flex-row gap-4">
+            <button
+              onClick={initializeUser}
+              className="relative overflow-hidden bg-green-600 text-white px-8 py-3 rounded-full shadow-lg hover:bg-green-700 transition-all"
+            >
+              <span className="font-semibold tracking-wide">
+                Get Started Today
+              </span>
+              <ArrowRight size={22} className="inline ml-2" />
+            </button>
 
-            {/* Bottom left - Community stats */}
-            <div className="h-1/3">
-              <ImageCard
-                src="https://images.pexels.com/photos/2889441/pexels-photo-2889441.jpeg?auto=compress&cs=tinysrgb&w=400"
-                alt="Community of farmers"
-                className="h-full"
-                overlay={
-                  <div className="bg-white/95 backdrop-blur-sm rounded-lg p-4 shadow-lg">
-                    <div className="text-2xl font-bold text-green-600">
-                      100k+
-                    </div>
-                    <div className="text-sm text-gray-700 font-medium">
-                      people joined
-                    </div>
-                  </div>
-                }
-              />
-            </div>
-
-            {/* Bottom right - Call to action */}
-            <div className="h-1/3">
-              <ImageCard
-                src="https://images.pexels.com/photos/1595104/pexels-photo-1595104.jpeg?auto=compress&cs=tinysrgb&w=400"
-                alt="Farmer working in field"
-                className="h-full"
-                overlay={
-                  <div className="bg-gradient-to-r from-green-600/95 to-emerald-600/95 backdrop-blur-sm rounded-lg p-4 shadow-lg text-white">
-                    <div className="text-sm font-semibold leading-tight">
-                      Join us in transforming the future of farming.
-                    </div>
-                  </div>
-                }
-              />
-            </div>
+            <button className="group flex items-center py-3 px-6 rounded-full bg-green-600/10 hover:bg-green-600/20 transition-all shadow-md">
+              <Lightbulb size={20} className="text-green-600" />
+              <span className="ml-3 font-medium text-green-800">
+                How it works
+              </span>
+            </button>
           </div>
         </div>
+
+        {/* RIGHT SIDE IMAGES */}
+        <div className="grid grid-cols-2 gap-4 h-[600px]">
+          <ImageCard
+            src="https://images.pexels.com/photos/974314/pexels-photo-974314.jpeg?auto=compress&cs=tinysrgb&w=800"
+            alt="Farmland"
+            className="col-span-2 h-2/3"
+          />
+          <ImageCard
+            src="https://images.pexels.com/photos/2889441/pexels-photo-2889441.jpeg?auto=compress&cs=tinysrgb&w=400"
+            alt="Community of farmers"
+          />
+          <ImageCard
+            src="https://images.pexels.com/photos/1595104/pexels-photo-1595104.jpeg?auto=compress&cs=tinysrgb&w=400"
+            alt="Farmer working in field"
+          />
+        </div>
       </div>
-      <RoleSelectionModal
-        isOpen={isModalOpenRegister}
-        onClose={() => setIsModalOpenRegister(false)}
-      />
-      <LoadingModal 
-      show = {isModalOpenLoading}
-      message ={modalMessage}
-      />
 
-
+      {/* Modals */}
+      
+      <LoadingModal show={isModalOpenLoading} message={modalMessage} />
     </section>
   );
 };

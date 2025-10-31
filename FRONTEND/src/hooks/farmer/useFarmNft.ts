@@ -1,7 +1,7 @@
 import { useReadContract, useAccount } from "wagmi";
 import farmNftABI from "../../../abi/farmNft.json";
 
-const CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_FARM_NFT_CONTRACT_ADDRESS as `0x${string}`;
+const farmNftAddress = import.meta.env.VITE_FARM_NFT_CONTRACT_ADDRESS as `0x${string}`;
 
 // ------------------ 1️⃣ useFarmData ------------------
 export function useFarmData(farmId?: number) {
@@ -13,7 +13,7 @@ export function useFarmData(farmId?: number) {
     isError,
     refetch,
   } = useReadContract({
-    address: CONTRACT_ADDRESS,
+    address: farmNftAddress,
     abi: farmNftABI,
     functionName: "getFarmData",
     args: farmId !== undefined ? [farmId] : undefined,
@@ -38,7 +38,7 @@ export function useFarmerFarms(farmerAddress?: `0x${string}`) {
     isError,
     refetch,
   } = useReadContract({
-    address: CONTRACT_ADDRESS,
+    address: farmNftAddress,
     abi: farmNftABI,
     functionName: "getFarmerFarms",
     args: farmerAddress ? [farmerAddress] : undefined,

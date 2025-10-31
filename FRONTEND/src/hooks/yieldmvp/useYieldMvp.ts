@@ -1,13 +1,13 @@
 import { useReadContract, useAccount } from "wagmi";
 import yieldMvpABI from "../../../abi/yieldMVP.json";
 
-const CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_YIELD_MVP_CONTRACT_ADDRESS as `0x${string}`;
+const yieldMvpAddress = import.meta.env.VITE_YIELD_MVP_CONTRACT_ADDRESS as `0x${string}`;
 
 // ------------------ 1️⃣ useNextFarmId ------------------
 export function useNextFarmId() {
   const { isConnected } = useAccount();
   const { data, isLoading, isError, refetch } = useReadContract({
-    address: CONTRACT_ADDRESS,
+    address: yieldMvpAddress,
     abi: yieldMvpABI,
     functionName: "nextFarmId",
     query: { enabled: isConnected },
@@ -19,7 +19,7 @@ export function useNextFarmId() {
 export function useOwner() {
   const { isConnected } = useAccount();
   const { data, isLoading, isError, refetch } = useReadContract({
-    address: CONTRACT_ADDRESS,
+    address: yieldMvpAddress,
     abi: yieldMvpABI,
     functionName: "owner",
     query: { enabled: isConnected },
@@ -31,7 +31,7 @@ export function useOwner() {
 export function useRoiBalances() {
   const { address, isConnected } = useAccount();
   const { data, isLoading, isError, refetch } = useReadContract({
-    address: CONTRACT_ADDRESS,
+    address: yieldMvpAddress,
     abi: yieldMvpABI,
     functionName: "roiBalances",
     args: address ? [address] : undefined,
@@ -44,7 +44,7 @@ export function useRoiBalances() {
 export function useFarmBasicDetails(farmId?: number) {
   const { isConnected } = useAccount();
   const { data, isLoading, isError, refetch } = useReadContract({
-    address: CONTRACT_ADDRESS,
+    address: yieldMvpAddress,
     abi: yieldMvpABI,
     functionName: "getFarmBasicDetails",
     args: farmId !== undefined ? [farmId] : undefined,
@@ -57,7 +57,7 @@ export function useFarmBasicDetails(farmId?: number) {
 export function useFarmMilestoneDetails(farmId?: number) {
   const { isConnected } = useAccount();
   const { data, isLoading, isError, refetch } = useReadContract({
-    address: CONTRACT_ADDRESS,
+    address: yieldMvpAddress,
     abi: yieldMvpABI,
     functionName: "getFarmMilestoneDetails",
     args: farmId !== undefined ? [farmId] : undefined,
@@ -70,7 +70,7 @@ export function useFarmMilestoneDetails(farmId?: number) {
 export function useFarmInvestors(farmId?: number) {
   const { isConnected } = useAccount();
   const { data, isLoading, isError, refetch } = useReadContract({
-    address: CONTRACT_ADDRESS,
+    address: yieldMvpAddress,
     abi: yieldMvpABI,
     functionName: "getFarmInvestors",
     args: farmId !== undefined ? [farmId] : undefined,
@@ -83,7 +83,7 @@ export function useFarmInvestors(farmId?: number) {
 export function useInvestorShares(farmId?: number, investorAddress?: `0x${string}`) {
   const { isConnected } = useAccount();
   const { data, isLoading, isError, refetch } = useReadContract({
-    address: CONTRACT_ADDRESS,
+    address: yieldMvpAddress,
     abi: yieldMvpABI,
     functionName: "getInvestorShares",
     args: farmId !== undefined && investorAddress ? [farmId, investorAddress] : undefined,
@@ -96,7 +96,7 @@ export function useInvestorShares(farmId?: number, investorAddress?: `0x${string
 export function useAllFarmsView() {
   const { isConnected } = useAccount();
   const { data, isLoading, isError, refetch } = useReadContract({
-    address: CONTRACT_ADDRESS,
+    address: yieldMvpAddress,
     abi: yieldMvpABI,
     functionName: "getAllFarmsView",
     query: { enabled: isConnected },

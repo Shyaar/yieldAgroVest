@@ -10,7 +10,7 @@ export function useFarmNftActions() {
     hash: txHash,
   });
 
-  const farmNftContractAddress = process.env.NEXT_PUBLIC_FARM_NFT_CONTRACT_ADDRESS as `0x${string}`;
+  const farmNftContractAddress = import.meta.env.VITE_FARM_NFT_CONTRACT_ADDRESS as `0x${string}`;
 
   const mintFarmNFT = (farmer: `0x${string}`, farmId: number, tokenURI: string) => {
     if (!isConnected) {

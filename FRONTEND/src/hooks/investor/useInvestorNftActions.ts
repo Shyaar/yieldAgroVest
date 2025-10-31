@@ -10,7 +10,7 @@ export function useInvestorNftActions() {
     hash: txHash,
   });
 
-  const investorNftContractAddress = process.env.NEXT_PUBLIC_INVESTOR_NFT_CONTRACT_ADDRESS as `0x${string}`;
+  const investorNftContractAddress = import.meta.env.VITE_INVESTOR_NFT_CONTRACT_ADDRESS as `0x${string}`;
 
   const mintInvestorNFT = (investor: `0x${string}`, farmId: number, tokenURI: string) => {
     if (!isConnected) {

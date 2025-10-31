@@ -5,13 +5,19 @@ import { X, Tractor, Briefcase } from 'lucide-react';
 interface RoleSelectionModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onSelectRole: (role: number) => void; // New prop to pass selected role
 }
 
-export const RoleSelectionModal: React.FC<RoleSelectionModalProps> = ({ isOpen, onClose }) => {
+export const RoleSelectionModal: React.FC<RoleSelectionModalProps> = ({ isOpen, onClose, onSelectRole }) => {
   if (!isOpen) return null;
 
+  const handleRoleSelect = (role: number) => {
+    onSelectRole(role);
+    onClose();
+  };
+
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
       <div className="bg-white rounded-lg shadow-2xl p-8 max-w-2xl w-full transform transition-all duration-300 scale-95 hover:scale-100">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-3xl font-bold text-gray-800">Choose Your Role</h2>
@@ -21,7 +27,10 @@ export const RoleSelectionModal: React.FC<RoleSelectionModalProps> = ({ isOpen, 
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
           {/* Farmer Card */}
-          <div className="border border-gray-200 rounded-lg p-6 flex flex-col items-center text-center hover:shadow-lg transition-shadow duration-300">
+          <div
+            className="border border-gray-200 rounded-lg p-6 flex flex-col items-center text-center hover:shadow-lg transition-shadow duration-300 cursor-pointer"
+            onClick={() => handleRoleSelect(0)} // Farmer role = 0
+          >
             <Tractor size={48} className="text-green-600 mb-4" />
             <h3 className="text-2xl font-semibold text-gray-800 mb-2">I am a Farmer</h3>
             <p className="text-gray-600 mb-4 text-[14px]">
@@ -29,7 +38,10 @@ export const RoleSelectionModal: React.FC<RoleSelectionModalProps> = ({ isOpen, 
             </p>
           </div>
           {/* Investor Card */}
-          <div className="border border-gray-200 rounded-lg p-6 flex flex-col items-center text-center hover:shadow-lg transition-shadow duration-300">
+          <div
+            className="border border-gray-200 rounded-lg p-6 flex flex-col items-center text-center hover:shadow-lg transition-shadow duration-300 cursor-pointer"
+            onClick={() => handleRoleSelect(1)} // Investor role = 1
+          >
             <Briefcase size={48} className="text-blue-600 mb-4" />
             <h3 className="text-2xl font-semibold text-gray-800 mb-2">Investor</h3>
             <p className="text-gray-600 mb-4 text-[14px]">
